@@ -38,16 +38,18 @@ def get_projects():
 with Flow("file-based-flow") as flow:
     data = get_data()
     print_data(data)
-    projects = get_projects()
-    print_data(projects)
 
 flow.storage = GitHub(
     repo="pnd-dkuda/prefect_github_flow",
-    path="get_projects.py",
-    # secrets=["GITHUB_ACCESS_TOKEN"]
+    path="flows/get_projects.py",
+    secrets=["GITHUB_ACCESS_TOKEN"]
 )
 
+
+# Register flow to prefect
+
 flow_bytes = flow.serialize()
+
 variables = {
   "projectId": "f6118a7e-81e9-46a7-9f2b-9da972825a06",
   "flow": flow_bytes
