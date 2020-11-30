@@ -1,6 +1,7 @@
 import requests
-from prefect import task, Flow
+from prefect import task, Flow, config
 from prefect.environments.storage import GitHub
+from prefect.client.secrets import Secret
 
 
 BASE_URL = 'https://agent.prefect.docs.pandata.de/'
@@ -41,7 +42,7 @@ with Flow("file-based-flow") as flow:
 
 flow.storage = GitHub(
     repo="pnd-dkuda/prefect_github_flow",
-    path="flows/get_projects.py",
+    path="/blob/main/flows/get_projects.py",
     secrets=["GITHUB_ACCESS_TOKEN"]
 )
 
