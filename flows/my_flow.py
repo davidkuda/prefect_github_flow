@@ -38,9 +38,9 @@ with Flow("file-based-flow",
 if __name__ == '__main__':
 
     api_client = api_client_register_flow.RegisterFlow(
-        flow,
-        'f6118a7e-81e9-46a7-9f2b-9da972825a06',
-        'https://localhost:4200'
+        flow=flow,
+        project_id='f6118a7e-81e9-46a7-9f2b-9da972825a06',
+        api_base_url='https://localhost:4200'
     )
 
     api_client.register_flow()
