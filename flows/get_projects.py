@@ -4,29 +4,6 @@ from prefect.environments.storage import GitHub
 import os
 
 
-# --- Env Vars --- #
-# os.environ['KEY'] = 'VALUE'
-
-
-# BASE_URL = 'https://agent.prefect.docs.pandata.de/'
-BASE_URL = 'http://localhost:4202/'
-query = 'query {project {id name}}'
-headers = {'Accept-Encoding': 'gzip, deflate, br',
-           'Content-Type': 'application/json',
-           'Accept': 'application/json',
-           'Connection': 'keep-alive',
-           'DNT': '1',
-           'Origin': 'https://agent.prefect.docs.pandata.de'}
-
-mutation_flow = '''
-mutation register_flow($flow: JSON!, $projectId: UUID!) {
-  create_flow(input: { serialized_flow: $flow, project_id: $projectId }) {
-    id
-  }
-}
-'''
-
-
 @task()
 def say_hello():
     print("Hello, world!")
@@ -48,16 +25,10 @@ def print_env():
     print(os.environ)
 
 
-@task()
-def get_projects():
-    r = requests.post(BASE_URL, json={'query': query}, headers=headers).json()
-    return r
-
-
 # --- Set Schedule // simple --- #
 from datetime import time, timedelta
 from prefect.schedules import IntervalSchedule
-schedule = IntervalSchedule(interval=timedelta(minutes=30))
+schedule = IntervalSchedule(interval=timedelta(days=1))
 
 
 # --- Set Schedule // complex --- #
@@ -81,13 +52,14 @@ schedule = IntervalSchedule(interval=timedelta(minutes=30))
 #     ]
 # )
 #
-schedule.next(4)
+# schedule.next(4)
 
 
 # --- Register the flow --- #
 
 with Flow(
-        "experiment_flow",
+        "finally ?",
+        # labels=["agent_dave"],
         schedule=schedule,
         storage=GitHub(
             repo="pnd-dkuda/prefect_github_flow",
@@ -114,8 +86,11 @@ with Flow(
 
 flow_bytes = flow.serialize()
 
+project_id_pandata = "f6118a7e-81e9-46a7-9f2b-9da972825a06"
+project_id_david = "9a4ca599-2a29-4f62-9957-96f386d820eb"
+
 variables = {
-  "projectId": "f6118a7e-81e9-46a7-9f2b-9da972825a06",
+  "projectId": project_id_david,
   "flow": flow_bytes
 }
 
@@ -132,3 +107,5 @@ if __name__ == '__main__':
 
     post = requests.post(BASE_URL, json={'query': mutation_flow, 'variables': variables}, headers=headers).json()
     print(post)
+
+    # flow.register('David 007')
